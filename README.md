@@ -20,8 +20,18 @@ Este proyecto es una aplicación de escritorio desarrollada en Python para la ge
 
 ## 🚀 Ejecución (Versión Portable / Ejecutable)
 
+### 📥 Descargar el Ejecutable
+
+Puedes descargar la última versión del ejecutable directamente desde la página de releases de GitHub:
+
+**[👉 Descargar SistemaGestionBD.exe desde Releases](https://github.com/JoaquinLoaizaUCSM/aplicativo_bd/releases/latest)**
+
+En la sección de "Assets" encontrarás el archivo `SistemaGestionBD.exe` listo para usar sin necesidad de instalar Python ni dependencias.
+
+### ▶️ Cómo Ejecutar
+
 Si dispone de la versión compilada (`.exe`):
-1.  Ubique la carpeta `dist`.
+1.  Descarga el archivo `SistemaGestionBD.exe` desde la página de releases (enlace arriba).
 2.  Asegúrese de que el archivo `db_config.json` esté junto al ejecutable.
 3.  Ejecute `SistemaGestionBD.exe`.
 
