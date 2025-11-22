@@ -1,4 +1,4 @@
-# Sistema de Gestión de Asistencias y Horas Extras
+# SISTEMA DE GESTIÓN Y CÁLCULO DE SOBRETIEMPOS
 
 Aplicación de escritorio para la gestión integral de empleados, turnos y asistencias. Diseñada para automatizar el cálculo de horas extras y facilitar la administración de personal mediante una interfaz intuitiva y potentes herramientas de importación.
 
