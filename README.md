@@ -1,6 +1,13 @@
-# Sistema de Gestión de Asistencias y Horas Extras
+# 📊 Sistema de Gestión de Sobretiempos
 
-Aplicación de escritorio para la gestión integral de empleados, turnos y asistencias. Diseñada para automatizar el cálculo de horas extras y facilitar la administración de personal mediante una interfaz intuitiva y potentes herramientas de importación.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-00758F?style=for-the-badge&logo=mysql&logoColor=white)
+![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![License](https://img.shields.io/badge/License-Academic-green?style=for-the-badge)
+
+> **Especializado en el cálculo, clasificación y reporte de horas extras.**
+
+Esta aplicación de escritorio está diseñada específicamente para **gestionar y calcular sobretiempos**, procesando registros de asistencia para generar reportes precisos de horas extras (25%, 35%, 100%) según la normativa, facilitando así el trabajo de planilla.
 
 ---
 
@@ -8,82 +15,86 @@ Aplicación de escritorio para la gestión integral de empleados, turnos y asist
 
 Proyecto desarrollado para el curso de **Gestión de Datos e Información** por:
 
-*   **Butrón Prieto Alexis Gonzalo**
-*   **Calla Torres Cristian Fernando**
-*   **Loaiza Cruz Joaquin Armando**
-*   **Sánchez Velasquez Adriano Alessio**
+| Integrante | Rol |
+| :--- | :--- |
+| **Butrón Prieto Alexis Gonzalo** | Desarrollador |
+| **Calla Torres Cristian Fernando** | Desarrollador |
+| **Loaiza Cruz Joaquin Armando** | Desarrollador |
+| **Sánchez Velasquez Adriano Alessio** | Desarrollador |
 
 ---
 
 ## ⭐ Características Destacadas
 
-*   **Gestión de Empleados:** CRUD completo con asignación de áreas y centros de coste.
-*   **Control de Asistencias:** Registro manual y masivo de entradas y salidas.
-*   **Cálculo Automático:** Clasificación de horas extras (25%, 35%, 100%) según normativa.
-*   **Importación Inteligente:** Carga masiva desde Excel (`.xlsx`) con detección de formatos.
+### ⏱️ Cálculo de Sobretiempos
+*   **Clasificación Automática:** Algoritmos precisos para identificar y clasificar horas extras (25%, 35%, 100%) basándose en las marcaciones.
+*   **Reglas de Negocio:** Aplicación de normativas vigentes para el cálculo de beneficios.
+
+### 📊 Reportes y Exportación
+*   **Reportes Detallados:** Generación de reportes listos para el área de nóminas/planilla.
+*   **Visualización de Datos:** Tablas claras para revisar el detalle de horas por trabajador.
+
+### 🔄 Gestión de Datos
+*   **Importación de Marcaciones:** Carga masiva de registros de entrada/salida desde Excel (`.xlsx`) para su procesamiento.
+*   **Maestro de Trabajadores:** Mantenimiento de la información necesaria de los empleados para el cálculo.
+
 ---
 
-## 🚀 Descarga y Ejecución (Recomendado)
+## 🚀 Descarga y Ejecución
 
-Para usar la aplicación **NO necesitas instalar Python** ni configurar entornos. Solo descarga el ejecutable.
+¡No necesitas instalar Python! Hemos empaquetado todo para ti.
 
 ### 📥 Paso 1: Descargar
-Ve a la sección de **Releases** en GitHub y descarga la última versión:
+Obtén la última versión estable desde nuestra sección de lanzamientos:
 
-**[👉 Descargar SistemaGestionBD.exe (Última Versión)](https://github.com/JoaquinLoaizaUCSM/aplicativo_bd/releases/latest)**
+[![Descargar v1.0](https://img.shields.io/badge/Descargar-SistemaGestionBD.exe-blueviolet?style=for-the-badge&logo=github)](https://github.com/JoaquinLoaizaUCSM/aplicativo_bd/releases/latest)
 
 ### ▶️ Paso 2: Ejecutar
-1.  Ubica el archivo `SistemaGestionBD.exe` descargado.
-2.  Asegúrate de tener el archivo de configuración `db_config.json` en la misma carpeta (si es la primera vez, el programa lo creará).
-3.  ¡Doble clic y listo!
+1.  Ubica el archivo `SistemaGestionBD.exe`.
+2.  Ejecútalo con doble clic.
+3.  Ingresa tus credenciales de base de datos cuando se soliciten.
+
+> [!NOTE]
+> El archivo `db_config.json` se creará automáticamente la primera vez para guardar tu configuración de conexión.
 
 ---
 
-## 🗄️ Base de Datos y Scripts de Prueba
+## 💻 Instalación para Desarrolladores
 
-Para que la aplicación funcione, necesitas una base de datos MySQL. Hemos incluido scripts listos para usar en la carpeta `Scripts SQL`.
+Si deseas contribuir o modificar el código fuente, sigue estos pasos:
 
-### 📂 Contenido de `Scripts SQL`
+### Requisitos Previos
+*   **Python 3.10** o superior.
+*   **MySQL Server 8.0** en ejecución.
 
-Ubicación: [`/Scripts SQL`](./Scripts%20SQL)
+### Configuración del Entorno
 
-1.  **`Crear_DB.sql`**: Crea la estructura base de la base de datos `sobretiempos`.
-2.  **`Procedures.sql`**: Instala todos los procedimientos almacenados necesarios para la lógica del negocio.
-3.  **`Triggers.sql`**: Configura los disparadores para automatizaciones en la BD.
-4.  **`Datos_trabajadores.sql`**: (Opcional) Carga datos de prueba para verificar el funcionamiento.
+1.  **Clonar el repositorio**
+    ```bash
+    git clone https://github.com/JoaquinLoaizaUCSM/aplicativo_bd.git
+    cd aplicativo_bd
+    ```
 
-### ⚙️ Configuración Rápida de la BD
+2.  **Crear entorno virtual**
+    ```bash
+    python -m venv .venv
+    ```
 
-1.  Abre tu gestor de MySQL (Workbench, DBeaver, etc.).
-2.  Ejecuta los scripts en el siguiente orden:
-    1.  `Crear_DB.sql`
-    2.  `Procedures.sql`
-    3.  `Triggers.sql`
-3.  (Opcional) Ejecuta `Datos_trabajadores.sql` si quieres tener empleados de prueba.
-4.  Al abrir la aplicación, ingresa tus credenciales de MySQL cuando se te soliciten.
+3.  **Instalar dependencias**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
----
-
-## 💻 Instalación para Desarrolladores (Código Fuente)
-
-Si deseas modificar el código o contribuir:
-
-### Requisitos
-*   Python 3.10+
-*   MySQL Server 8.0
-
-### Pasos
-1.  Clonar el repositorio.
-2.  Crear entorno virtual: `python -m venv .venv`
-3.  Instalar dependencias: `pip install -r requirements.txt`
-4.  Ejecutar: `python main.py`
-
-O usa el script automático en Windows:
-```powershell
-.\run_app.ps1
-```
+4.  **Ejecutar la aplicación**
+    ```bash
+    python main.py
+    ```
+    *O usa el script automático en Windows:*
+    ```powershell
+    .\run_app.ps1
+    ```
 
 ---
 
 ## 📄 Licencia
-Este software es de uso privado y académico.
+Este software fue desarrollado con fines académicos y de uso privado.
