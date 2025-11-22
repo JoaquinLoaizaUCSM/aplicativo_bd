@@ -73,7 +73,7 @@ class MainWindow:
             ("👥", "Empleados", self._show_employees),
             ("📝", "Asistencias", self._show_attendance),
             ("📈", "Reportes", self._show_reports),
-            ("📁", "Importar", self._import_csv),
+            ("📁", "Importar", self._import_data),
         ]
         self.sidebar = Sidebar(main_container, APP_CONFIG.get('app_name', 'GDI System'), menu_items)
         self.sidebar.pack(side='left', fill='y')
@@ -159,7 +159,7 @@ class MainWindow:
         if self.current_view_name == "employees": self._show_employees()
         elif self.current_view_name == "attendance": self._show_attendance()
         elif self.current_view_name == "reports": self._show_reports()
-        elif self.current_view_name == "import": self._import_csv()
+        elif self.current_view_name == "import": self._import_data()
         else: self._show_dashboard()
 
     def _clear_content(self):
@@ -248,7 +248,7 @@ class MainWindow:
         self.sidebar.set_active(3)
         ReportsView(self.content_area, self.report_service, self.employee_service).render()
 
-    def _import_csv(self):
+    def _import_data(self):
         self._clear_content()
         self.current_view_name = "import"
         self.sidebar.set_active(4)

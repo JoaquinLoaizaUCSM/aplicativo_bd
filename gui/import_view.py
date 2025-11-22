@@ -1,14 +1,13 @@
 """
-Vista del módulo de Importación CSV
+Vista del módulo de Importación
 Autor: Joaquin Armando Loaiza Cruz
 Fecha: 2025-11-11
-Descripción: Importación de datos desde archivos CSV
+Descripción: Importación de datos desde archivos Excel
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox, filedialog, simpledialog
 from typing import Optional, Dict, Any
-import csv
 import sys
 import os
 from datetime import datetime, time
@@ -26,7 +25,7 @@ from database.employee_service import EmployeeService
 
 
 class ImportView:
-    """Vista para importar datos desde CSV y Excel"""
+    """Vista para importar datos desde Excel"""
     
     def __init__(self, parent_frame: tk.Frame, attendance_service: Optional[AttendanceService] = None, employee_service: Optional[EmployeeService] = None):
         """
@@ -35,7 +34,7 @@ class ImportView:
         Args:
             parent_frame: Frame contenedor principal
             attendance_service: Servicio de asistencias para importar datos
-            employee_service: Servicio de empleados para validaciones o importación
+            employee_service: Servicio de empleados (No utilizado actualmente, mantenido por compatibilidad)
         """
         self.parent_frame = parent_frame
         self.attendance_service = attendance_service
@@ -70,7 +69,7 @@ class ImportView:
         
         tk.Label(
             info_frame,
-            text="Esta funcionalidad permite importar datos masivos desde archivos Excel y CSV.\n"
+            text="Esta funcionalidad permite importar datos masivos desde archivos Excel.\n"
                  "Asegúrese de que el archivo tenga el formato correcto antes de importar.",
             font=('Segoe UI', 9),
             bg='#e3f2fd',
@@ -100,7 +99,7 @@ class ImportView:
         
         tk.Label(
             title_content,
-            text="Importación de Datos (Excel/CSV)",
+            text="Importación de Datos (Excel)",
             font=('Segoe UI', 20, 'bold'),
             bg='white',
             fg='#2c3e50'
@@ -119,14 +118,6 @@ class ImportView:
                 'columns': 'Hoja: Resumen Detallado (Codigo, Fecha, Turno, Ingreso, Salida)',
                 'example': 'Formato estándar del reporte de asistencia',
                 'command': lambda: self._import_attendance_excel(),
-                'btn_text': '📂 Seleccionar Excel (.xlsx)'
-            },
-            {
-                'title': '👥 Importar Empleados (Excel)',
-                'description': 'Importa un listado de empleados desde Excel',
-                'columns': 'Código, Nombre, DNI, Puesto, Centro Coste, Subdivisión',
-                'example': 'E00001, Juan Pérez, 12345678, Operario, CC001, SUB1',
-                'command': lambda: self._import_employees_excel(),
                 'btn_text': '📂 Seleccionar Excel (.xlsx)'
             }
         ]
@@ -245,89 +236,9 @@ class ImportView:
             anchor='w',
             padx=10
         ).pack(fill='x', pady=(0, 5))
-    
-    def _import_employees_excel(self):
-        """Importa empleados desde Excel"""
-        if not self.employee_service:
-            messagebox.showerror("Error", "No hay conexión a la base de datos")
-            return
-
-        if openpyxl is None:
-            messagebox.showerror("Error", "La librería 'openpyxl' no está instalada.")
-            return
-
-        filename = filedialog.askopenfilename(
-            title="Seleccionar archivo Excel de empleados",
-            filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")]
-        )
-        
-        if not filename:
-            return
-        
-        try:
-            wb = openpyxl.load_workbook(filename, data_only=True)
-            sheet = wb.active # Usar la hoja activa por defecto
-            
-            if sheet is None:
-                messagebox.showerror("Error", "El archivo Excel no tiene una hoja activa.")
-                return
-            
-            assert sheet is not None # Hint for type checker
-
-            success_count = 0
-            error_count = 0
-            errors = []
-            
-            # Iterar filas empezando desde la 2 (saltar cabecera)
-            for idx, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-                try:
-                    # Asumir columnas: A=Codigo, B=Nombre, C=DNI, D=Puesto, E=CentroCoste, F=Subdivision
-                    if not row[0]:
-                        continue
-                        
-                    codigo = str(row[0]).strip()
-                    nombre = str(row[1]).strip() if len(row) > 1 and row[1] else f"Empleado {codigo}"
-                    dni = str(row[2]).strip() if len(row) > 2 and row[2] else "00000000"
-                    puesto = str(row[3]).strip() if len(row) > 3 and row[3] else "Sin Asignar"
-                    centro_coste = str(row[4]).strip() if len(row) > 4 and row[4] else "1" # Default CC
-                    subdivision = str(row[5]).strip() if len(row) > 5 and row[5] else None
-                    
-                    result = self.employee_service.create_employee(
-                        codigo=codigo,
-                        nombre=nombre,
-                        dni=dni,
-                        puesto=puesto,
-                        codigo_centro_coste=centro_coste,
-                        subdivision=subdivision
-                    )
-                    
-                    if result.ok:
-                        success_count += 1
-                    else:
-                        # Si falla, intentar actualizar? No, por ahora solo reportar
-                        error_count += 1
-                        if len(errors) < 5:
-                            errors.append(f"Fila {idx} ({codigo}): {result.message}")
-                            
-                except Exception as e:
-                    error_count += 1
-                    if len(errors) < 5:
-                        errors.append(f"Fila {idx}: Error inesperado - {str(e)}")
-            
-            msg = (f"Proceso completado.\n\n"
-                   f"✅ Importados: {success_count}\n"
-                   f"❌ Errores: {error_count}")
-            
-            if errors:
-                msg += "\n\nDetalle de errores (primeros 5):\n" + "\n".join(errors)
-            
-            messagebox.showinfo("Resultado de Importación", msg)
-            
-        except Exception as e:
-            messagebox.showerror("Error", f"Error al leer archivo:\n{str(e)}")
 
 # -------------------------------------------------------------------------
-    # MÉTODOS NUEVOS Y MODIFICADOS PARA IMPORTACIÓN DE 1 TRABAJADOR
+    # MÉTODOS PARA IMPORTACIÓN
     # -------------------------------------------------------------------------
 
     def _import_attendance_excel(self):

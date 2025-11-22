@@ -12,6 +12,13 @@ from datetime import datetime, timedelta
 import sys
 import os
 
+# Importar openpyxl para manejo de Excel
+try:
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+except ImportError:
+    openpyxl = None
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from database.report_service import ReportService
@@ -136,16 +143,6 @@ class ReportsView:
             command=self._toggle_employee_filter
         ).grid(row=1, column=1, sticky='w', padx=(0, 15))
         
-        #tk.Radiobutton(
-         #   content,
-          #  text="Por Centro de Coste",
-           # variable=self.tipo_reporte,
-            #value="centro",
-            #font=('Segoe UI', 9),
-            #bg='white',
-            #command=self._toggle_employee_filter
-        #).grid(row=1, column=2, sticky='w')
-        
         # Fecha Inicio
         tk.Label(content, text="Fecha Inicio:", font=('Segoe UI', 10), bg='white').grid(row=2, column=0, sticky='w', padx=(0, 10), pady=(10, 0))
         self.fecha_inicio_entry = tk.Entry(content, font=('Segoe UI', 10), width=15)
@@ -200,6 +197,21 @@ class ReportsView:
             padx=30,
             pady=12
         ).pack(side='left')
+
+        # Botón Exportar Nómina
+        tk.Button(
+            btn_frame,
+            text="💰 Exportar Nómina",
+            command=self._export_payroll_excel,
+            font=('Segoe UI', 10),
+            bg='#ff9800',
+            fg='white',
+            activebackground='#f57c00',
+            relief='flat',
+            cursor='hand2',
+            padx=30,
+            pady=12
+        ).pack(side='left', padx=(10, 0))
     
     def _toggle_employee_filter(self):
         """Habilita/deshabilita el filtro de empleado"""
@@ -578,3 +590,97 @@ class ReportsView:
             'title': title,
             'group_field': group_field
         }
+
+    def _export_payroll_excel(self):
+        """Exporta reporte de nómina con formato específico (COD SAP, CC NOMINA, CANTIDAD)"""
+        if not hasattr(self, 'last_report_data') or not self.last_report_data:
+            messagebox.showwarning("Advertencia", "Primero debe generar un reporte")
+            return
+
+        if self.last_report_type != 'empleado':
+            messagebox.showwarning("Advertencia", "Para exportar la nómina, debe generar un reporte 'Por Empleado'.")
+            return
+
+        if openpyxl is None:
+            messagebox.showerror("Error", "La librería 'openpyxl' no está instalada.")
+            return
+
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=[("Excel Workbook", "*.xlsx")],
+            initialfile=f"Nomina_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+            title="Guardar Reporte de Nómina"
+        )
+        
+        if not filename:
+            return
+
+        try:
+            from openpyxl import Workbook
+            from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "Carga Nómina"
+
+            # Estilos
+            header_font = Font(bold=True, color="FFFFFF")
+            header_fill = PatternFill("solid", fgColor="4472C4")
+            border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+            
+            # Cabeceras
+            headers = ["COD SAP", "CC NOMINA", "CANTIDAD"]
+            for col_num, header in enumerate(headers, 1):
+                cell = ws.cell(row=1, column=col_num, value=header)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = Alignment(horizontal="center")
+                cell.border = border
+
+            # Datos
+            row_num = 2
+            for row in self.last_report_data:
+                cod_sap = row.get('codigo_empleado')
+                if not cod_sap: continue
+
+                # Convertir valores a float
+                def _get_float(key):
+                    val = row.get(key, 0)
+                    if val is None: return 0.0
+                    return float(val)
+
+                h25 = _get_float('total_horas_25')
+                h35 = _get_float('total_horas_35')
+                h100 = _get_float('total_horas_100')
+
+                # Fila H25 (Código 1250)
+                if h25 > 0:
+                    self._write_row(ws, row_num, cod_sap, "1250", h25, border)
+                    row_num += 1
+                
+                # Fila H35 (Código 1252)
+                if h35 > 0:
+                    self._write_row(ws, row_num, cod_sap, "1252", h35, border)
+                    row_num += 1
+                    
+                # Fila H100 (Código 1260)
+                if h100 > 0:
+                    self._write_row(ws, row_num, cod_sap, "1260", h100, border)
+                    row_num += 1
+
+            # Ajustar ancho columnas
+            ws.column_dimensions['A'].width = 15
+            ws.column_dimensions['B'].width = 15
+            ws.column_dimensions['C'].width = 15
+
+            wb.save(filename)
+            messagebox.showinfo("Éxito", f"Archivo generado correctamente:\n{filename}")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"Ocurrió un error inesperado:\n{str(e)}")
+
+    def _write_row(self, ws, row_num, cod, cc, cant, border):
+        """Escribe una fila en el Excel"""
+        ws.cell(row=row_num, column=1, value=cod).border = border
+        ws.cell(row=row_num, column=2, value=cc).border = border
+        ws.cell(row=row_num, column=3, value=cant).border = border

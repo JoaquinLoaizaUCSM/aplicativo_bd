@@ -273,12 +273,12 @@ class EmployeesView:
         
         headers = [
             ("CÓDIGO", 0.08),
-            ("NOMBRE", 0.20),
+            ("NOMBRE", 0.12),
             ("DNI", 0.10),
             ("PUESTO", 0.16),
             ("UNIDAD ORGANIZATIVA", 0.16),
             ("CENTRO DE COSTE", 0.14),
-            ("ACCIONES", 0.16)
+            ("ACCIONES", 0.45)
         ]
         
         for header_text, width in headers:
@@ -341,7 +341,7 @@ class EmployeesView:
                     
                     # Botones de acción
                     actions_frame = tk.Frame(row_frame, bg=row_bg)
-                    actions_frame.place(relx=0.92, rely=0.5, anchor='center')
+                    actions_frame.place(relx=0.90, rely=0.5, anchor='center')
                     
                     tk.Button(
                         actions_frame,
