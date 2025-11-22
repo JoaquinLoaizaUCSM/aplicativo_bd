@@ -1,0 +1,13 @@
+# Dependencias del Aplicativo de Gestión de Base de Datos
+# Entrega 5 - GDI
+
+# Conector nativo para MySQL
+mysql-connector-python==8.2.0
+
+# Manejo de archivos Excel
+openpyxl==3.1.5
+
+# Nota: Tkinter viene incluido con Python, no requiere instalación
+
+# Herramienta para crear ejecutable
+pyinstaller
