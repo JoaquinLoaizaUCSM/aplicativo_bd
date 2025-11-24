@@ -128,7 +128,7 @@ class Header(tk.Frame):
             fg='#e3f2fd'
         ).pack(anchor='w')
         
-        # Right: Config Button
+        #Right: Config Button
         btn = tk.Button(
             content,
             text="⚙️ Configuración",

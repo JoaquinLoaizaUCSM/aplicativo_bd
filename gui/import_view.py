@@ -515,10 +515,31 @@ class ImportView:
         if val is None or str(val).strip() in ['-', '', 'None', 'nan']:
             return None
         try:
+            # Caso 1: Objetos datetime/time nativos
             if isinstance(val, (datetime, time)):
                 return val.strftime('%H:%M:%S')
-            # Si es string, limpiarlo
-            return str(val).strip()
+            
+            # Caso 2: Strings
+            val_str = str(val).strip()
+            
+            # Intentar formatos comunes de 24h y 12h
+            formats = [
+                '%H:%M:%S',     # 14:30:00
+                '%H:%M',        # 14:30
+                '%I:%M:%S %p',  # 02:30:00 PM
+                '%I:%M %p',     # 02:30 PM
+                '%I:%M%p'       # 02:30PM
+            ]
+            
+            for fmt in formats:
+                try:
+                    dt = datetime.strptime(val_str, fmt)
+                    return dt.strftime('%H:%M:%S')
+                except ValueError:
+                    continue
+                    
+            # Si no coincide con ninguno, devolver limpio (fallback)
+            return val_str
         except:
             return None
 
@@ -543,23 +564,56 @@ class ImportView:
             return True
             
         # Si no está en caché, intentar insertarlo
-        # Intentar parsear horarios del string raw (ej: "A10 (07:00-15:00)")
         start_time = '00:00:00'
         end_time = '00:00:00'
         
-        if shift_raw_value and '(' in shift_raw_value and ')' in shift_raw_value:
+        # Intentar parsear horarios del string raw
+        # Formato 1: "A10 (07:00-15:00)"
+        # Formato 2: "A10 7:00 a 3:00 pm"
+        if shift_raw_value:
+            raw = shift_raw_value.lower()
+            
             try:
-                # Extraer contenido entre paréntesis
-                times = shift_raw_value.split('(')[1].split(')')[0] # "07:00-15:00"
-                if '-' in times:
-                    parts = times.split('-')
-                    if len(parts) == 2:
-                        # Asegurar formato HH:MM:SS
-                        t1 = parts[0].strip()
-                        t2 = parts[1].strip()
-                        start_time = t1 + ":00" if len(t1) == 5 else t1
-                        end_time = t2 + ":00" if len(t2) == 5 else t2
-            except:
+                # Estrategia 1: Paréntesis (07:00-15:00)
+                if '(' in raw and ')' in raw:
+                    times = raw.split('(')[1].split(')')[0]
+                    if '-' in times:
+                        parts = times.split('-')
+                        if len(parts) == 2:
+                            start_time = self._parse_excel_time(parts[0]) or '00:00:00'
+                            end_time = self._parse_excel_time(parts[1]) or '00:00:00'
+                            
+                # Estrategia 2: Separador " a " (7:00 a 3:00 pm)
+                elif ' a ' in raw:
+                    # Buscar patrones de hora antes y después del " a "
+                    parts = raw.split(' a ')
+                    if len(parts) >= 2:
+                        # Parte izquierda: "A10 7:00" o "A18 10:00 pm"
+                        left_part = parts[0].strip()
+                        tokens_left = left_part.split(' ')
+                        
+                        t1_candidate = tokens_left[-1]
+                        # Si termina en am/pm, tomar también el anterior
+                        if t1_candidate in ['am', 'pm'] and len(tokens_left) >= 2:
+                            t1_candidate = f"{tokens_left[-2]} {t1_candidate}"
+                        
+                        # Parte derecha: "3:00 pm" o "6:00 am"
+                        right_part = parts[1].strip()
+                        # Tomar todo lo que parezca hora al inicio
+                        # Simplemente intentamos parsear todo el string derecho, 
+                        # o si es muy largo, buscamos tokens.
+                        # Generalmente "3:00 pm" es todo el string.
+                        t2_candidate = right_part
+                        
+                        # Convertir a 24h
+                        st = self._parse_excel_time(t1_candidate)
+                        et = self._parse_excel_time(t2_candidate)
+                        
+                        if st: start_time = st
+                        if et: end_time = et
+
+            except Exception as e:
+                print(f"Error parseando turno '{shift_raw_value}': {e}")
                 pass
                 
         # Insertar en BD
