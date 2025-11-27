@@ -98,7 +98,7 @@ def save_db_config(new_config: Dict[str, Any]) -> Dict[str, Any]:
 # Configuración de la aplicación
 APP_CONFIG = {
     'title': 'Sistema de Gestión de Base de Datos',
-    'app_name': 'Kola Real',
+    'app_name': 'Empresa de Bebidas',
     'version': '1.0',
     'width': 1400,
     'height': 800,
