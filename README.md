@@ -17,7 +17,7 @@ Proyecto desarrollado para el curso de **Gestión de Datos e Información** por:
 
 | Integrante | Rol |
 | :--- | :--- |
-| **Sánchez Velasquez Adriano Alessio** | Lider-Desarrollador |
+| **Sánchez Velasquez Adriano Alessio** | Lider-Desarrollador - migajero - servicios extras en noches |
 | **Butrón Prieto Alexis Gonzalo** | Desarrollador |
 | **Calla Torres Cristian Fernando** | Desarrollador |
 | **Loaiza Cruz Joaquin Armando** | Desarrollador |
